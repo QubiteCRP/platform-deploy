@@ -1,0 +1,59 @@
+name: q-bit
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  pipeline:
+    build: ./cryptoAi
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - ./cryptoAi/.env
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+
+  server:
+    build: ./servergoQbites
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+
+  web:
+    build: ./chart-ui
+    restart: unless-stopped
+    depends_on:
+      - server
+    environment:
+      GRAPHQL_TARGET: http://server:8080
+      # Bind-mounted source on Docker/macOS needs polling for reliable HMR.
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      # Live source for Vite HMR; the anonymous volume keeps the image's
+      # Linux node_modules from being shadowed by the host's.
+      - ./chart-ui:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+
+volumes:
+  mongo-data:
