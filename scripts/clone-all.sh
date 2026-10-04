@@ -5,9 +5,9 @@ set -e
 
 PARENT_DIR="../"
 REPOS=(
-  "chart-ui"
-  "servergoQbites"
-  "cryptoAi"
+  "nexora-web"
+  "nexora-api"
+  "nexora-engine"
 )
 
 echo "🚀 Q-BIT Platform Setup"
@@ -32,6 +32,6 @@ echo ""
 echo "✅ All repositories ready!"
 echo ""
 echo "Next steps:"
-echo "  1. Copy .env.example to ../cryptoAi/.env and add API keys"
+echo "  1. Copy .env.example to ../nexora-engine/.env and add API keys"
 echo "  2. Run: docker compose up -d"
 echo "  3. Open: http://localhost:5173"

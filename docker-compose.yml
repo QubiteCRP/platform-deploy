@@ -16,18 +16,19 @@ services:
       start_period: 20s
 
   pipeline:
-    build: ./cryptoAi
+    build: ../nexora-engine
     restart: unless-stopped
     depends_on:
       mongo:
         condition: service_healthy
     env_file:
-      - ./cryptoAi/.env
+      - ../nexora-engine/.env
     environment:
       MONGO_URI: mongodb://mongo:27017
+      QBIT_CRYPTO_PROVIDER: binance
 
   server:
-    build: ./servergoQbites
+    build: ../nexora-api
     restart: unless-stopped
     depends_on:
       mongo:
@@ -39,7 +40,7 @@ services:
       - "8080:8080"
 
   web:
-    build: ./chart-ui
+    build: ../nexora-web
     restart: unless-stopped
     depends_on:
       - server
@@ -50,7 +51,7 @@ services:
     volumes:
       # Live source for Vite HMR; the anonymous volume keeps the image's
       # Linux node_modules from being shadowed by the host's.
-      - ./chart-ui:/app
+      - ../nexora-web:/app
       - /app/node_modules
     ports:
       - "5173:5173"

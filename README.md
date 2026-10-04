@@ -1,4 +1,4 @@
-# Q-BIT Trading Platform - Deployment
+# Nexora Platform - Deployment
 
 **Autonomous crypto & equities trading terminal with ML-powered signals**
 
@@ -8,13 +8,13 @@ This platform orchestrates 4 microservices:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  chart-ui (React)          :5173                        │
+│  nexora-web (React)        :5173                        │
 │  ↓ GraphQL queries                                      │
-│  servergoQbites (Go)       :8080                        │
+│  nexora-api (Go)           :8080                        │
 │  ↓ reads MongoDB                                        │
 │  MongoDB                   :27017                       │
 │  ↑ written by                                           │
-│  cryptoAi (Python ML)      background pipeline          │
+│  nexora-engine (Python ML) background pipeline          │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -22,9 +22,9 @@ This platform orchestrates 4 microservices:
 
 | Service | Repository | Description |
 |---------|-----------|-------------|
-| **chart-ui** | `../chart-ui` | React + MUI trading dashboard |
-| **servergoQbites** | `../servergoQbites` | Go GraphQL API server |
-| **cryptoAi** | `../cryptoAi` | Python ML pipeline (signals, indicators, bot) |
+| **nexora-web** | `../nexora-web` | React + MUI trading dashboard |
+| **nexora-api** | `../nexora-api` | Go GraphQL API server |
+| **nexora-engine** | `../nexora-engine` | Python ML pipeline (signals, indicators, bot) |
 | **MongoDB** | Docker image | Data persistence |
 
 ## 🚀 Quick Start
@@ -36,26 +36,26 @@ This platform orchestrates 4 microservices:
 ### 1. Clone repositories (if not already present)
 
 ```bash
-cd /Users/achenak/expedia/q-bit
+cd /path/to/q-bit
 
 # If repos aren't cloned yet:
-# git clone <chart-ui-repo-url>
-# git clone <servergoQbites-repo-url>
-# git clone <cryptoAi-repo-url>
+# git clone <chart-ui-repo-url> nexora-web
+# git clone <servergoQbites-repo-url> nexora-api
+# git clone <cryptoAi-repo-url> nexora-engine
 ```
 
 ### 2. Set up environment files
 
 ```bash
-# Create cryptoAi/.env with API keys
-cp cryptoAi/.env.example cryptoAi/.env
+# Create nexora-engine/.env with API keys
+cp nexora-engine/.env.example nexora-engine/.env
 # Edit with your keys: BINANCE_API_KEY, ALPACA_API_KEY, etc.
 ```
 
 ### 3. Start the platform
 
 ```bash
-cd platform-deploy
+cd nexora-infra
 docker compose up -d
 ```
 
@@ -71,13 +71,13 @@ docker compose up -d
 
 ```bash
 # Frontend only (with HMR)
-cd ../chart-ui && npm run dev
+cd ../nexora-web && npm run dev
 
 # Backend only
-cd ../servergoQbites && go run .
+cd ../nexora-api && go run .
 
 # Pipeline only
-cd ../cryptoAi && python -m src.main
+cd ../nexora-engine && python main.py
 ```
 
 ### Logs
@@ -108,13 +108,12 @@ Edit `docker-compose.yml` to customize:
 
 ```
 q-bit/
-├── platform-deploy/          ← YOU ARE HERE
+├── nexora-infra/             ← YOU ARE HERE
 │   ├── docker-compose.yml    ← Orchestration
 │   └── README.md
-├── chart-ui/                 ← React frontend
-├── servergoQbites/          ← Go GraphQL API
-├── cryptoAi/                ← Python ML pipeline
-└── chart-ui-design/         ← POC worktree (port 5180)
+├── nexora-web/               ← React frontend
+├── nexora-api/               ← Go GraphQL API
+└── nexora-engine/            ← Python ML pipeline
 ```
 
 ## 🧹 Cleanup
@@ -129,7 +128,7 @@ docker compose down -v           # Stop + delete volumes (MongoDB data)
 **MongoDB connection failed:**
 ```bash
 docker compose down
-docker volume rm platform-deploy_mongo-data
+docker volume rm q-bit_mongo-data
 docker compose up -d
 ```
 
@@ -139,7 +138,7 @@ docker compose up -d
 
 **Python dependencies missing:**
 ```bash
-cd ../cryptoAi
+cd ../nexora-engine
 pip install -r requirements.txt
 ```
 
