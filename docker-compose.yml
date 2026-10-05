@@ -4,8 +4,9 @@ services:
   mongo:
     image: mongo:7
     restart: unless-stopped
+    # Unauthenticated: reachable from this machine only.
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -26,6 +27,12 @@ services:
     environment:
       MONGO_URI: mongodb://mongo:27017
       QBIT_CRYPTO_PROVIDER: binance
+    healthcheck:
+      test: ["CMD", "python3", "healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 180s
 
   server:
     build: ../nexora-api
@@ -35,17 +42,25 @@ services:
         condition: service_healthy
     environment:
       MONGO_URI: mongodb://mongo:27017
-      PORT: "8080"
+      PORT: "8090"
+      ENABLE_PLAYGROUND: "true"
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8090:8090"
+    healthcheck:
+      test: ["CMD", "/server", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   web:
     build: ../nexora-web
     restart: unless-stopped
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     environment:
-      GRAPHQL_TARGET: http://server:8080
+      GRAPHQL_TARGET: http://server:8090
       # Bind-mounted source on Docker/macOS needs polling for reliable HMR.
       CHOKIDAR_USEPOLLING: "true"
     volumes:

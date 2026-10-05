@@ -10,7 +10,7 @@ This platform orchestrates 4 microservices:
 ┌─────────────────────────────────────────────────────────┐
 │  nexora-web (React)        :5173                        │
 │  ↓ GraphQL queries                                      │
-│  nexora-api (Go)           :8080                        │
+│  nexora-api (Go)           :8090                        │
 │  ↓ reads MongoDB                                        │
 │  MongoDB                   :27017                       │
 │  ↑ written by                                           │
@@ -62,7 +62,7 @@ docker compose up -d
 ### 4. Access the UI
 
 - **Trading Terminal**: http://localhost:5173
-- **GraphQL API**: http://localhost:8080/graphql
+- **GraphQL API**: http://localhost:8090/ (playground) · /query (API)
 - **MongoDB**: mongodb://localhost:27017
 
 ## 🛠️ Development
